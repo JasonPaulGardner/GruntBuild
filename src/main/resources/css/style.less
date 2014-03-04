@@ -1,0 +1,14 @@
+@nice-blue: #5B83AD;
+@light-blue: (@nice-blue + #111);
+
+.border-radius (@radius: 5px) {
+  border-radius: @radius;
+  -moz-border-radius: @radius;
+  -webkit-border-radius: @radius;
+}
+
+.bordered {
+  border-top: solid 1px @light-blue;
+  border-bottom: solid 2px @nice-blue;
+  .border-radius
+}

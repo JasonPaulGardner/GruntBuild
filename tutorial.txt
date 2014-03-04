@@ -1,0 +1,401 @@
+﻿Tutorial
+
+What is Grunt.js?
+
+Grunt.js is an open source task-based command line build tool written in JavaScript on top of the Node.js platform. 
+It was written by Ben Alman at Bocoup a leading "Open Web technology company" based in Boston.
+And is actively maintained by a strong, vibrant and rapidly growing community.
+
+
+Why should I use Grunt.js?
+
+Javascript is the lingua franca of the Web and as front end Web Developers it is (should) be the language we are most familiar with.
+As Grunt is written in Javascript if follows that it can be enhanced and adapted with Javascript allowing project specific build
+requirements to be easily automated in a way that supports a consistent configuration and execution interface.  
+Grunt is straightforward to configure with a centralized JSON configuration object. The grunt API also is well documented with many examples.
+And a large repository of plugins providing a vast selection of pre-built build tasks
+
+
+Who is using it?
+
+Lots of excellent projects are leveraging Grunt.js. To name a few:
+
+jQuery
+Twitter
+SauceLabs
+WordPress
+Yeoman
+CanJS
+Many, many, many more… 
+http://gruntjs.com/who-uses-grunt
+
+
+Get Started
+
+install node
+
+http://nodejs.org/
+
+Install grunt (v0.4)
+
+npm install -g grunt-cli
+
+This installs grunt globaly for project stability we want a project local version as well
+
+We will do this by createing a package.json file
+
+npm init
+
+npm install grunt --save-dev
+
+this should have created a package.json file with "devDependencies" stanza like below
+  
+"devDependencies": {
+    "grunt": "~0.4.1"
+  }  
+  
+  
+Setting Up Your Gruntfile
+Now let's set up our grunt file to tell grunt what to do. Create a file called Gruntfile.js and fill it with this:
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+  
+  });
+
+  // Load plugins here
+
+  // Define your tasks here
+
+};  
+
+
+Add our first Grunt task  (copy)
+  
+npm install grunt-contrib-copy --save-dev  
+
+"devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-copy": "~0.4.1"
+  }  
+  
+modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+  });
+
+  // Load plugins here
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
+  // Define your tasks here
+
+};
+
+This configuration will copy all files from the dev/ folder, including subdirectories and their contents, into the prod/ folder creating the prod folder if it does not exist  
+ 
+ 
+Run mkdir dev
+Run touch dev/file.txt 
+Run grunt copy
+
+Configure the default task 
+
+modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+  });
+
+  // Load plugins here
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy']);
+
+};
+
+rm -fr prod
+run grunt
+
+Add a second Grunt task (clean)
+
+npm install grunt-contrib-clean --save-dev  
+
+"devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1"    
+  }  
+  
+modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    // Configure the clean task to remove the prod directory
+    clean: ["prod"]
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+  });
+
+  // Load plugins here
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy']);
+
+};
+ 
+run grunt clean
+
+DRY the loadNpmTasks config
+
+npm install matchdep --save-dev 
+
+ "devDependencies": {
+    "matchdep": "~0.3.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1"    
+  }  
+
+  modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    // Configure the clean task to remove the prod directory
+    clean: ["prod"]
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+  });
+
+  // Load plugins here
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy']);
+
+};
+
+run grunt
+run grunt clean
+
+Automate the build on save of file
+
+npm install grunt-contrib-watch --save-dev 
+
+ "devDependencies": {
+    "matchdep": "~0.3.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3"    
+  }  
+
+  modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    // Configure the clean task to remove the prod directory
+    clean: ["prod"]
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+    watch: {
+      app: {
+        files: ['dev/**'],
+        tasks: ['copy:generated']
+      },
+    },  
+  });
+
+  // Load plugins here
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy', 'watch']);
+
+};
+
+run grunt
+
+in an other terminal edit dev/file.txt and save
+
+run grunt clean
+
+Start a server to serve the files over http
+
+npm install grunt-contrib-connect --save-dev 
+
+ "devDependencies": {
+    "matchdep": "~0.3.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-connect": "~0.5.0"    
+  }  
+
+  modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    // Configure the clean task to remove the prod directory
+    clean: ["prod"]
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+    connect: {
+      server: {
+        options: {
+          port: 9001,
+          base: 'generated'
+        }
+      }
+    },
+    watch: {
+      app: {
+        files: ['dev/**'],
+        tasks: ['copy:generated']
+      },
+    },  
+  });
+
+  // Load plugins here
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy', 'watch']);
+
+};
+
+run grunt
+
+create dev/index.html and save
+
+visit localhost:9001
+
+run grunt clean
+
+Get browser to automatically reload when files change
+
+  modify the Grunt file as below
+
+module.exports = function(grunt) {
+
+  // Configuration goes here
+  grunt.initConfig({
+    // Configure the clean task to remove the prod directory
+    clean: ["prod"]
+    // Configure the copy task to move files from the development to production folders
+    copy: {
+      target: {
+        files: {
+          'prod/': ['dev/**']
+        }
+      }
+    },
+    connect: {
+      server: {
+        options: {
+          port: 9001,
+          base: 'generated',
+          livereload: true
+        }
+      }
+    },
+    watch: {
+      app: {
+        files: ['dev/**'],
+        tasks: ['copy:generated'],
+        options: {
+          livereload: true,
+        },
+      },
+    },  
+  });
+
+  // Load plugins here
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+  // Define your tasks here
+  grunt.registerTask('default', ['copy', 'watch']);
+
+};
+
+run grunt
+
+visit localhost:9001
+
+edit dev/index.html and save
+
+run grunt clean
+
+
+
+
+
+"grunt-contrib-jshint": "~0.6.4",
+"grunt-contrib-less": "~0.7.0",
+"grunt-contrib-csslint": "~0.1.2",
+"grunt-contrib-cssmin": "~0.6.2",
+"grunt-contrib-imagemin": "~0.3.0",
+"grunt-contrib-htmlmin": "~0.1.3",
+"grunt-contrib-requirejs": "~0.4.1", 
+"grunt-contrib-jasmine": "~0.5.2",
+"grunt-contrib-compress": "~0.3.3"
