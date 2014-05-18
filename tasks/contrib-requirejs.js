@@ -18,6 +18,7 @@ module.exports = function(grunt) {
 			'underscore':"empty:",
 			'i18n':"empty:"
 			},
+      findNestedDependencies: false,
 		  optimize:"uglify2",
 		  generateSourceMaps:true,
 		  preserveLicenseComments:false,
